@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: fitverse_admin
+      POSTGRES_PASSWORD: elite_password_2026
+      POSTGRES_DB: fitverse_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: ./fitness-api
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://fitverse_admin:elite_password_2026@db:5432/fitverse_prod
+      JWT_SECRET: fitverse_quantum_secret_key
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+    depends_on:
+      - db
+
+  web:
+    build: ./fitness-web
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --fv-primary: #ccff00;
+    --fv-bg: #050505;
+    --background: var(--fv-bg);
+    --foreground: #ffffff;
+}
+
+@layer base {
+    body {
+        @apply bg-background text-foreground;
+        font-family: var(--font-inter), sans-serif;
+        font-feature-settings: "cv11", "ss01";
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ccff00;
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+.font-oswald {
+    font-family: var(--font-oswald), sans-serif;
+    @apply tracking-tighter uppercase;
+}
+
+/* Glow Effects */
+.text-shadow-glow {
+    text-shadow: 0 0 20px rgba(204, 255, 0, 0.4);
+}
+
+.box-shadow-glow {
+    box-shadow: 0 0 40px rgba(204, 255, 0, 0.1);
+}
+
+/* Smooth Transitions */
+.transition-pro {
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
