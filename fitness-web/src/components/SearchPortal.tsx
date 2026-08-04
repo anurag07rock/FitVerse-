@@ -73,12 +73,12 @@ export const SearchPortal = ({ isOpen, onClose }: { isOpen: boolean, onClose: ()
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-2xl flex items-start justify-center pt-[10vh] px-6"
+                    className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-2xl flex items-start justify-center px-6"
                 >
                     <motion.div
-                        initial={{ scale: 0.95, y: 20 }}
+                        initial={{ scale: 0.95, y: -20 }}
                         animate={{ scale: 1, y: 0 }}
-                        className="w-full max-w-4xl bg-[#111] border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+                        className="w-full max-w-4xl bg-[#111] border border-white/10 border-t-0 rounded-b-3xl shadow-2xl overflow-hidden"
                     >
                         {/* Search Input Area */}
                         <div className="p-6 border-b border-white/5 flex items-center gap-4">
