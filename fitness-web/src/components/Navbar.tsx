@@ -3,16 +3,20 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, BarChart3, Dumbbell, LayoutDashboard, Music2, Users, Wind, Zap, Search, User, Settings, LogOut } from 'lucide-react';
+import { Activity, BarChart3, Dumbbell, LayoutDashboard, Music2, Users, Wind, Zap, Search, User, Settings, LogOut, Key, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchPortal } from './SearchPortal';
+import { useAuth } from './Providers';
+import { EditProfileModal } from './profile/EditProfileModal';
 
 const cn = (...classes: any[]) => classes.filter(Boolean).join(' ');
 
 export const Navbar = () => {
     const pathname = usePathname();
+    const { user, logout } = useAuth();
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
     const navItems = [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -26,6 +30,7 @@ export const Navbar = () => {
 
 
     return (
+        <>
         <nav className="fixed top-0 left-0 w-full h-20 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5 z-[1000] px-8 flex items-center justify-between">
             <div className="flex items-center gap-12">
                 <Link href="/" className="text-2xl font-black uppercase tracking-tighter italic">
@@ -65,9 +70,13 @@ export const Navbar = () => {
                 <div className="relative">
                     <div 
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
-                        className="w-10 h-10 rounded-full border-2 border-[#ccff00] overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                        className="w-10 h-10 rounded-full border-2 border-[#ccff00] overflow-hidden cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center bg-[#111]"
                     >
-                        <img src="https://i.pravatar.cc/150?u=me" className="w-full h-full object-cover" />
+                        {user?.avatarUrl ? (
+                            <img src={user.avatarUrl} className="w-full h-full object-cover" />
+                        ) : (
+                            <User size={20} className="text-white/40" />
+                        )}
                     </div>
 
                     {/* Dropdown Menu */}
@@ -87,19 +96,36 @@ export const Navbar = () => {
                                     className="absolute right-0 top-14 w-64 bg-[#111] border border-white/10 rounded-xl shadow-2xl z-[1002] overflow-hidden"
                                 >
                                     <div className="p-4 border-b border-white/5">
-                                        <h4 className="text-white font-bold">Alex ap289</h4>
-                                        <p className="text-white/40 text-xs">alex@fitverse.ai</p>
+                                        <h4 className="text-white font-bold">{user?.name || 'Guest User'}</h4>
+                                        <p className="text-white/40 text-xs">{user?.email || user?.phone || 'Not logged in'}</p>
                                     </div>
                                     <div className="p-2 flex flex-col gap-1">
-                                        <button className="flex items-center gap-3 w-full p-2 text-left text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                        <button 
+                                            onClick={() => {
+                                                setIsProfileOpen(false);
+                                                setIsEditModalOpen(true);
+                                            }}
+                                            className="flex items-center gap-3 w-full p-2 text-left text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                                        >
                                             <User size={16} /> Edit Profile
                                         </button>
                                         <button className="flex items-center gap-3 w-full p-2 text-left text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                                            <Settings size={16} /> Settings
+                                            <Key size={16} /> Login Details
                                         </button>
+                                        <Link href="/account" onClick={() => setIsProfileOpen(false)}>
+                                            <button className="flex items-center gap-3 w-full p-2 text-left text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                <FileText size={16} /> Account Details
+                                            </button>
+                                        </Link>
                                     </div>
                                     <div className="p-2 border-t border-white/5">
-                                        <button className="flex items-center gap-3 w-full p-2 text-left text-sm text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+                                        <button 
+                                            onClick={() => {
+                                                setIsProfileOpen(false);
+                                                logout();
+                                            }}
+                                            className="flex items-center gap-3 w-full p-2 text-left text-sm text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                        >
                                             <LogOut size={16} /> Log Out
                                         </button>
                                     </div>
@@ -112,5 +138,7 @@ export const Navbar = () => {
 
             <SearchPortal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </nav>
+        <EditProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+        </>
     );
 };

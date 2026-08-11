@@ -1,193 +1,293 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Search, X, Disc, Heart, ListMusic,
-    ChevronDown, Volume2, Mic2, Activity,
-    Play, Pause, SkipForward
+    Search, X, Disc, Activity,
+    ChevronDown, Volume2,
+    Play, Pause, SkipForward, SkipBack
 } from 'lucide-react';
+import { Track } from './SpotifyService';
 
 interface ExpandedPlayerProps {
-    currentTrack: any;
+    currentTrack: Track | null;
     isPlaying: boolean;
+    progress: number; // 0-1
+    volume: number;   // 0-1
     onTogglePlay: () => void;
     onNext: () => void;
+    onPrev: () => void;
     onMinimize: () => void;
     onSearch: (q: string) => void;
-    searchResults: any[];
+    onSeek: (ratio: number) => void;
+    onVolumeChange: (vol: number) => void;
+    searchResults: Track[];
     playlists: any[];
     isConnected: boolean;
     onConnect: () => void;
-    onSelectTrack: (track: any) => void;
+    onSelectTrack: (track: Track) => void;
 }
 
 export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
     currentTrack,
     isPlaying,
+    progress,
+    volume,
     onTogglePlay,
     onNext,
+    onPrev,
     onMinimize,
     onSearch,
+    onSeek,
+    onVolumeChange,
     searchResults,
     playlists,
     isConnected,
     onConnect,
-    onSelectTrack
+    onSelectTrack,
 }) => {
     const [query, setQuery] = useState('');
+    const progressRef = useRef<HTMLDivElement>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSearch(query);
     };
 
+    const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!progressRef.current) return;
+        const rect = progressRef.current.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        onSeek(ratio);
+    };
+
+    // Determine if a playlist item is directly playable (Jamendo track shape)
+    const isPlayableItem = (item: any): item is Track =>
+        item && typeof item.previewUrl !== 'undefined';
+
     return (
         <div className="h-full flex flex-col bg-[#0a0a0a]">
             {/* Header */}
-            <div className="p-6 flex items-center justify-between border-b border-white/5">
+            <div className="px-6 pt-4 pb-3 flex items-center justify-between border-b border-white/5 flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-[#ccff00] rounded-full animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#ccff00]">Performance Studio</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#ccff00]">
+                        Performance Studio
+                    </span>
+                    {!isConnected && (
+                        <span className="text-[8px] font-black uppercase tracking-widest text-white/20 ml-2">
+                            • Jamendo Mode
+                        </span>
+                    )}
                 </div>
                 <button
                     onClick={onMinimize}
-                    className="p-2 text-white/20 hover:text-white transition-colors"
+                    className="p-1.5 text-white/20 hover:text-white transition-colors rounded-lg hover:bg-white/5"
                 >
-                    <ChevronDown size={20} />
+                    <ChevronDown size={18} />
                 </button>
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-hidden flex flex-col">
-                {!isConnected ? (
-                    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-transparent to-[#ccff00]/5">
-                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
-                            <Disc size={40} className="text-white/20 animate-spin-slow" />
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+                {!isConnected && playlists.length === 0 ? (
+                    // Spotify connect CTA
+                    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                            <Disc size={32} className="text-white/20 animate-spin-slow" />
                         </div>
-                        <h3 className="text-xl font-black uppercase italic mb-2 font-black">Sync Spotify</h3>
-                        <p className="text-white/40 text-xs mb-8 max-w-[240px]">Handshake required to stream your performance archives.</p>
+                        <h3 className="text-lg font-black uppercase italic mb-1">Sync Spotify</h3>
+                        <p className="text-white/40 text-xs mb-6 max-w-[220px]">
+                            Connect for full library access, or search tracks below.
+                        </p>
                         <button
                             onClick={onConnect}
-                            className="px-8 py-4 bg-[#1DB954] text-black font-black uppercase text-[10px] rounded-2xl shadow-[0_0_30px_rgba(29,185,84,0.3)] hover:scale-105 active:scale-95 transition-all"
+                            className="px-6 py-3 bg-[#1DB954] text-black font-black uppercase text-[10px] rounded-2xl shadow-[0_0_20px_rgba(29,185,84,0.25)] hover:scale-105 active:scale-95 transition-all"
                         >
-                            Authorize HANDSHAKE
+                            Authorize Handshake
                         </button>
                     </div>
                 ) : (
-                    <div className="flex-1 flex flex-col">
-                        {/* Search Bar */}
-                        <div className="p-4">
-                            <form onSubmit={handleSubmit} className="relative">
+                    <div className="flex-1 flex flex-col min-h-0">
+                        {/* Search */}
+                        <div className="px-4 pt-3 pb-2 flex-shrink-0">
+                            <form onSubmit={handleSearchSubmit} className="relative">
                                 <input
                                     type="text"
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
-                                    placeholder="Search performance tracks..."
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-10 text-xs font-bold text-white focus:outline-none focus:border-[#ccff00]/50 transition-colors uppercase tracking-widest"
+                                    placeholder="Search tracks..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-9 text-xs font-bold text-white focus:outline-none focus:border-[#ccff00]/40 transition-colors uppercase tracking-widest"
                                 />
-                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
+                                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
                                 {query && (
                                     <button
                                         type="button"
                                         onClick={() => { setQuery(''); onSearch(''); }}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white"
                                     >
-                                        <X size={14} />
+                                        <X size={12} />
                                     </button>
                                 )}
                             </form>
                         </div>
 
-                        {/* Results / Discovery */}
-                        <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4 custom-scrollbar">
+                        {/* Track List */}
+                        <div className="flex-1 overflow-y-auto px-4 pb-3 space-y-1 min-h-0" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(204,255,0,0.15) transparent' }}>
                             {searchResults.length > 0 ? (
-                                <div className="space-y-2">
-                                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2 px-2">Search Results</p>
+                                <>
+                                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2 px-1">Search Results</p>
                                     {searchResults.map((track) => (
-                                        <button
+                                        <TrackRow
                                             key={track.id}
+                                            track={track}
+                                            isActive={currentTrack?.id === track.id}
+                                            isPlaying={isPlaying && currentTrack?.id === track.id}
                                             onClick={() => onSelectTrack(track)}
-                                            className="w-full p-2 bg-white/5 border border-white/5 rounded-xl flex items-center gap-3 group hover:border-[#ccff00]/30 transition-all text-left"
-                                        >
-                                            <img src={track.albumImage} alt="" className="w-10 h-10 rounded-lg object-cover" />
-                                            <div className="flex-1 min-w-0">
-                                                <h5 className="text-[11px] font-bold text-white truncate uppercase">{track.title}</h5>
-                                                <p className="text-[9px] text-white/40 font-black truncate uppercase">{track.artist}</p>
-                                            </div>
-                                            <Activity size={14} className="text-[#ccff00] opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </button>
+                                        />
                                     ))}
-                                </div>
+                                </>
                             ) : (
-                                <div className="space-y-4">
-                                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2 px-2">Featured Playlists</p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {playlists.map((pl) => (
+                                <>
+                                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2 px-1">
+                                        {isConnected ? 'Featured Playlists' : 'Workout Tracks'}
+                                    </p>
+                                    {playlists.map((item) => {
+                                        const track = item._track as Track | undefined;
+                                        if (track) {
+                                            // Jamendo track shape
+                                            return (
+                                                <TrackRow
+                                                    key={item.id}
+                                                    track={track}
+                                                    isActive={currentTrack?.id === track.id}
+                                                    isPlaying={isPlaying && currentTrack?.id === track.id}
+                                                    onClick={() => onSelectTrack(track)}
+                                                />
+                                            );
+                                        }
+                                        // Spotify playlist shape — display only
+                                        return (
                                             <div
-                                                key={pl.id}
-                                                className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer border border-white/5 hover:border-[#ccff00]/40 transition-all"
+                                                key={item.id}
+                                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-default"
                                             >
-                                                <img src={pl.images?.[0]?.url} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" alt="" />
-                                                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black to-transparent">
-                                                    <h6 className="text-[10px] font-black text-white uppercase truncate tracking-tight">{pl.name}</h6>
+                                                <img
+                                                    src={item.images?.[0]?.url}
+                                                    alt={item.name}
+                                                    className="w-9 h-9 rounded-lg object-cover"
+                                                />
+                                                <div className="min-w-0">
+                                                    <p className="text-[11px] font-bold text-white truncate uppercase">{item.name}</p>
+                                                    <p className="text-[9px] text-white/30 uppercase font-black">{item.tracks?.total} tracks</p>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                        );
+                                    })}
+                                </>
                             )}
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* Now Playing Bar in Expanded */}
-            <div className="p-6 bg-white/5 border-t border-white/10">
-                <div className="flex items-center gap-4 mb-4">
-                    <img src={currentTrack?.albumImage || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=100&q=80'} className="w-12 h-12 rounded-xl object-cover" alt="" />
-                    <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-bold text-white truncate uppercase">{currentTrack?.title || 'System Standby'}</h4>
-                        <p className="text-[10px] text-[#ccff00] font-black uppercase tracking-widest truncate">{currentTrack?.artist || 'FitVerse AI'}</p>
+            {/* Now Playing Controls */}
+            <div className="flex-shrink-0 px-5 pt-3 pb-4 bg-white/[0.03] border-t border-white/5">
+                {/* Track Info */}
+                <div className="flex items-center gap-3 mb-3">
+                    <div className="relative w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
+                        {currentTrack?.albumImage && (
+                            <img src={currentTrack.albumImage} alt="" className="w-full h-full object-cover" />
+                        )}
                     </div>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={onTogglePlay}
-                            className="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
-                        >
-                            {isPlaying ? <Pause size={18} fill="black" /> : <Play size={18} fill="black" className="ml-0.5" />}
+                    <div className="flex-1 min-w-0">
+                        <h4 className="text-[11px] font-bold text-white truncate uppercase tracking-tight">
+                            {currentTrack?.title || 'System Standby'}
+                        </h4>
+                        <p className="text-[9px] text-[#ccff00] font-black uppercase tracking-widest truncate">
+                            {currentTrack?.artist || 'FitVerse AI'}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button onClick={onPrev} className="text-white/20 hover:text-white transition-colors">
+                            <SkipBack size={16} />
                         </button>
                         <button
-                            onClick={onNext}
-                            className="text-white/20 hover:text-white"
+                            onClick={onTogglePlay}
+                            className="w-9 h-9 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
                         >
-                            <SkipForward size={20} />
+                            {isPlaying
+                                ? <Pause size={15} fill="black" />
+                                : <Play size={15} fill="black" className="ml-0.5" />
+                            }
+                        </button>
+                        <button onClick={onNext} className="text-white/20 hover:text-white transition-colors">
+                            <SkipForward size={16} />
                         </button>
                     </div>
                 </div>
-                <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: isPlaying ? '100%' : '35%' }}
-                        transition={{ duration: isPlaying ? 30 : 0.5 }}
-                        className="h-full bg-[#ccff00] shadow-[0_0_10px_#ccff00]"
+
+                {/* Seekable Progress */}
+                <div
+                    ref={progressRef}
+                    onClick={handleProgressClick}
+                    className="h-1 bg-white/10 rounded-full overflow-hidden cursor-pointer mb-3 group"
+                >
+                    <div
+                        className="h-full bg-[#ccff00] shadow-[0_0_8px_#ccff00] transition-all duration-200 relative"
+                        style={{ width: `${Math.min(100, progress * 100)}%` }}
+                    >
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                </div>
+
+                {/* Volume */}
+                <div className="flex items-center gap-2">
+                    <Volume2 size={12} className="text-white/20 flex-shrink-0" />
+                    <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={volume}
+                        onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
+                        className="flex-1 h-1 accent-[#ccff00] cursor-pointer"
                     />
                 </div>
             </div>
-
-            <style jsx>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(204, 255, 0, 0.2);
-                }
-            `}</style>
         </div>
     );
 };
+
+// ── Reusable track row ──────────────────────────────────────────────────────
+const TrackRow: React.FC<{
+    track: Track;
+    isActive: boolean;
+    isPlaying: boolean;
+    onClick: () => void;
+}> = ({ track, isActive, isPlaying, onClick }) => (
+    <button
+        onClick={onClick}
+        className={`w-full p-2 rounded-xl flex items-center gap-3 group text-left transition-all ${
+            isActive
+                ? 'bg-[#ccff00]/10 border border-[#ccff00]/20'
+                : 'hover:bg-white/5 border border-transparent'
+        }`}
+    >
+        <div className="relative w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+            <img src={track.albumImage} alt="" className="w-full h-full object-cover" />
+            {isActive && isPlaying && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <Activity size={12} className="text-[#ccff00]" />
+                </div>
+            )}
+        </div>
+        <div className="flex-1 min-w-0">
+            <p className={`text-[11px] font-bold truncate uppercase ${isActive ? 'text-[#ccff00]' : 'text-white'}`}>
+                {track.title}
+            </p>
+            <p className="text-[9px] text-white/40 font-black truncate uppercase">{track.artist}</p>
+        </div>
+        {!track.previewUrl && (
+            <span className="text-[7px] text-white/20 uppercase tracking-widest">No preview</span>
+        )}
+    </button>
+);

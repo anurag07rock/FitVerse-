@@ -8,7 +8,7 @@ import { User } from '../../auth/entities/user.entity';
 export class SpotifyService {
     private readonly clientId = process.env.SPOTIFY_CLIENT_ID;
     private readonly clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-    private readonly redirectUri = `${process.env.NEXT_PUBLIC_API_URL}/spotify/callback`;
+    private readonly redirectUri = `${process.env.NEXT_PUBLIC_API_URL}/music/callback`;
 
     constructor(
         @InjectRepository(User)
