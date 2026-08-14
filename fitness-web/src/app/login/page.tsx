@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import { useAuth } from '@/components/Providers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Phone, Lock, ArrowRight, Activity } from 'lucide-react';
+import api from '@/services/api';
 
 export default function LoginPage() {
     const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // Form state
     const [email, setEmail] = useState('');
@@ -17,19 +19,30 @@ export default function LoginPage() {
     const [otp, setOtp] = useState('');
     const [otpSent, setOtpSent] = useState(false);
 
-    const handleEmailLogin = (e: React.FormEvent) => {
+    const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            login({
-                id: '123',
-                name: 'Alex ap289',
-                email: email,
-                avatarUrl: 'https://i.pravatar.cc/150?u=me',
-                createdAt: new Date().toISOString()
+        setError(null);
+        try {
+            const response = await api.post('/auth/login', {
+                email,
+                password_hash: password // API matches password_hash parameter
             });
-        }, 1000);
+            const { user, token } = response.data;
+            const mappedUser = {
+                id: user.id,
+                name: user.full_name || 'FitVerse Athlete',
+                email: user.email,
+                avatarUrl: user.avatarUrl || `https://i.pravatar.cc/150?u=${user.id}`,
+                createdAt: user.createdAt || new Date().toISOString()
+            };
+            login(mappedUser, token);
+        } catch (err: any) {
+            console.error('Login error', err);
+            setError(err.response?.data?.message || 'Invalid credentials');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSendOtp = () => {
@@ -123,6 +136,11 @@ export default function LoginPage() {
                                     Forgot password? <span className="text-[9px] text-white/20">(coming soon)</span>
                                 </button>
                             </div>
+                            {error && (
+                                <div className="text-red-500 text-xs font-black uppercase tracking-wider text-center mt-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                                    {error}
+                                </div>
+                            )}
                             <button 
                                 type="submit" 
                                 disabled={isLoading}

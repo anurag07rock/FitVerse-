@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import api from '@/services/api';
 
 interface User {
     id: string;
@@ -16,7 +17,7 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoaded: boolean;
-    login: (user: User) => void;
+    login: (user: User, token?: string) => void;
     logout: () => void;
     updateUser: (data: Partial<User>) => void;
 }
@@ -29,27 +30,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
 
     useEffect(() => {
-        // Hydrate from localStorage
-        const storedUser = localStorage.getItem('fitverse_user');
-        if (storedUser) {
-            try {
-                setUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error(e);
+        const hydrate = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await api.get('/auth/profile');
+                    const profile = response.data;
+                    const mappedUser: User = {
+                        id: profile.id,
+                        name: profile.full_name || 'FitVerse Athlete',
+                        email: profile.email,
+                        avatarUrl: profile.avatarUrl || `https://i.pravatar.cc/150?u=${profile.id}`,
+                        createdAt: profile.createdAt || new Date().toISOString()
+                    };
+                    setUser(mappedUser);
+                    localStorage.setItem('fitverse_user', JSON.stringify(mappedUser));
+                } catch (e) {
+                    console.error('Failed to validate profile session', e);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('fitverse_user');
+                    setUser(null);
+                }
+            } else {
+                const storedUser = localStorage.getItem('fitverse_user');
+                if (storedUser) {
+                    try {
+                        setUser(JSON.parse(storedUser));
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
             }
-        }
-        setIsLoaded(true);
+            setIsLoaded(true);
+        };
+        hydrate();
     }, []);
 
-    const login = (userData: User) => {
+    const login = (userData: User, token?: string) => {
         setUser(userData);
         localStorage.setItem('fitverse_user', JSON.stringify(userData));
+        if (token) {
+            localStorage.setItem('token', token);
+        }
         router.push('/');
     };
 
     const logout = () => {
         setUser(null);
         localStorage.removeItem('fitverse_user');
+        localStorage.removeItem('token');
         router.push('/login');
     };
 
