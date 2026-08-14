@@ -11,6 +11,21 @@ const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 export const metadata: Metadata = {
     title: "FitVerse AI | Elite Performance Platform",
     description: "Next-generation AI-powered fitness ecosystem.",
+    metadataBase: new URL('https://fitverse.ai'),
+    openGraph: {
+        title: "FitVerse AI | Elite Performance Platform",
+        description: "Next-generation AI-powered fitness ecosystem.",
+        type: "website",
+        siteName: "FitVerse AI",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "FitVerse AI | Elite Performance Platform",
+        description: "Next-generation AI-powered fitness ecosystem.",
+    },
+    alternates: {
+        canonical: '/',
+    },
 };
 
 export default function RootLayout({

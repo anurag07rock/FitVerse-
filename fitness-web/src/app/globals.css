@@ -14,6 +14,8 @@
         @apply bg-background text-foreground;
         font-family: var(--font-inter), sans-serif;
         font-feature-settings: "cv11", "ss01";
+        /* Prevent horizontal scroll at the document level */
+        overflow-x: hidden;
     }
 }
 
@@ -58,3 +60,19 @@ h4,
 .transition-pro {
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
+
+/* Hide scrollbar utility — used on horizontally scrollable rows */
+.no-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Keyboard focus ring — visible only on keyboard nav, not mouse clicks */
+:focus-visible {
+    outline: 2px solid #ccff00;
+    outline-offset: 2px;
+    border-radius: 4px;
+}

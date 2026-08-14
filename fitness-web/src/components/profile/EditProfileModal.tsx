@@ -116,6 +116,7 @@ export const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => 
                                         type="text" 
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
+                                        autoComplete="name"
                                         className="w-full bg-black border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#ccff00] transition-colors"
                                         placeholder="Enter your name"
                                     />
@@ -167,7 +168,7 @@ export const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => 
 
                                     {!showAIAvatars ? (
                                         <div className="flex flex-col gap-2">
-                                            <button onClick={() => galleryInputRef.current?.click()} className="flex items-center gap-4 p-4 text-white hover:bg-white/5 rounded-xl transition-colors text-left">
+                                            <button onClick={() => galleryInputRef.current?.click()} className="flex items-center gap-4 p-4 text-white hover:bg-white/5 rounded-xl transition-colors text-left min-h-[44px]">
                                                 <div className="p-3 bg-white/5 rounded-full"><ImageIcon size={20} className="text-[#ccff00]"/></div>
                                                 <div className="flex-1"><div className="font-bold">Choose from Gallery</div><div className="text-xs text-white/40">Select an image from your photos</div></div>
                                             </button>

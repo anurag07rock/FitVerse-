@@ -18,9 +18,11 @@ const CATEGORIES = [
 ];
 
 async function fetchJamendoByTag(tag: string): Promise<Track[]> {
+    const clientId = process.env.NEXT_PUBLIC_JAMENDO_CLIENT_ID || '56d30cce';
     try {
         const url = new URL('https://api.jamendo.com/v3.0/tracks/');
-        url.searchParams.set('client_id', '56d30cce');
+        url.searchParams.set('client_id', clientId);
+
         url.searchParams.set('format', 'json');
         url.searchParams.set('limit', '12');
         url.searchParams.set('tags', tag);

@@ -360,7 +360,8 @@ export default function MusicPanel() {
                     height: isExpanded ? 400 : 110,
                 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="fixed bottom-6 right-6 z-[1001] bg-[#0a0a0a]/95 backdrop-blur-3xl border border-white/10 rounded-[32px] overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] min-w-[320px] max-w-[520px]"
+                className="fixed bottom-0 md:bottom-6 left-2 right-2 md:left-auto md:right-6 z-[1001] bg-[#0a0a0a]/95 backdrop-blur-3xl border border-white/10 rounded-[32px] overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] md:min-w-[320px] md:max-w-[520px]"
+                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
             >
                 {isExpanded ? (
                     <ExpandedPlayer

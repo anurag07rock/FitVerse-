@@ -49,7 +49,7 @@ export default function ProgressPage() {
                             <Activity size={14} className="text-[#ccff00]" />
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ccff00]">Athletic Analytics</span>
                         </motion.div>
-                        <h1 className="text-8xl font-black uppercase italic tracking-tighter leading-none mb-4">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-tighter leading-none mb-4">
                             Performance <span className="text-[#ccff00]">Data.</span>
                         </h1>
                         <p className="text-white/40 max-w-xl text-lg font-medium">
@@ -72,7 +72,7 @@ export default function ProgressPage() {
                                 <stat.icon size={28} />
                             </div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">{stat.label}</p>
-                            <h3 className="text-4xl font-black mb-2 tracking-tighter">{stat.val}</h3>
+                            <h3 className="text-2xl sm:text-4xl font-black mb-2 tracking-tighter">{stat.val}</h3>
                             <p className="text-[10px] font-bold text-[#ccff00] uppercase tracking-tighter">{stat.sub}</p>
                         </motion.div>
                     ))}
@@ -123,7 +123,7 @@ export default function ProgressPage() {
                         </div>
 
                         <div className="flex-1 flex items-center justify-center py-10 relative">
-                            <svg className="w-64 h-64 transform -rotate-90">
+                            <svg className="w-full max-w-[240px] h-auto aspect-square transform -rotate-90">
                                 <circle
                                     cx="128"
                                     cy="128"

@@ -99,6 +99,8 @@ export default function LoginPage() {
                                     type="email" 
                                     placeholder="Email Address" 
                                     required
+                                    autoComplete="email"
+                                    inputMode="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full bg-black border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:border-[#ccff00] transition-colors"
@@ -110,10 +112,16 @@ export default function LoginPage() {
                                     type="password" 
                                     placeholder="Password" 
                                     required
+                                    autoComplete="current-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full bg-black border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:border-[#ccff00] transition-colors"
                                 />
+                            </div>
+                            <div className="flex justify-end">
+                                <button type="button" className="text-xs text-white/30 hover:text-white/60 transition-colors">
+                                    Forgot password? <span className="text-[9px] text-white/20">(coming soon)</span>
+                                </button>
                             </div>
                             <button 
                                 type="submit" 
@@ -138,6 +146,8 @@ export default function LoginPage() {
                                     type="tel" 
                                     placeholder="Phone Number (+1 234...)" 
                                     required
+                                    autoComplete="tel"
+                                    inputMode="tel"
                                     disabled={otpSent}
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
@@ -158,6 +168,8 @@ export default function LoginPage() {
                                             placeholder="Enter 6-digit OTP" 
                                             required
                                             maxLength={6}
+                                            autoComplete="one-time-code"
+                                            inputMode="numeric"
                                             value={otp}
                                             onChange={(e) => setOtp(e.target.value)}
                                             className="w-full bg-black border border-[#ccff00]/50 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:border-[#ccff00] transition-colors text-center font-mono tracking-widest text-lg"

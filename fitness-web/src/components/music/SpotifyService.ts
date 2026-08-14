@@ -1,5 +1,7 @@
 import api from '@/services/api';
 
+const JAMENDO_CLIENT_ID = process.env.NEXT_PUBLIC_JAMENDO_CLIENT_ID || '56d30cce';
+
 export interface Track {
     id: string;
     title: string;

@@ -46,7 +46,10 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise }) => {
                 <div className="relative aspect-video overflow-hidden">
                     <motion.img
                         src={thumbnail}
-                        alt={name}
+                        alt={name || 'Exercise thumbnail'}
+                        width={640}
+                        height={360}
+                        loading="lazy"
                         animate={{ scale: isHovered ? 1.1 : 1 }}
                         className="w-full h-full object-cover transition-transform duration-700"
                     />

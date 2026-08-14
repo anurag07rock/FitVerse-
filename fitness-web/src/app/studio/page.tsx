@@ -46,7 +46,7 @@ function StudioPageContent() {
                             <Sparkles size={14} className="text-[#ccff00]" />
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ccff00]">AI Session Engine</span>
                         </motion.div>
-                        <h1 className="text-8xl font-black uppercase italic tracking-tighter leading-none mb-4">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-tighter leading-none mb-4">
                             Fitness <span className="text-[#ccff00]">Studio.</span>
                         </h1>
                         <p className="text-white/40 max-w-xl text-lg font-medium">
@@ -69,13 +69,13 @@ function StudioPageContent() {
                 </div>
 
                 {/* 2. Filters Row */}
-                <div className="flex flex-wrap items-center gap-6 mb-20 overflow-x-auto pb-4 no-scrollbar">
-                    <div className="flex bg-white/5 border border-white/10 p-1 rounded-2xl">
+                <div className="flex flex-nowrap items-center gap-4 mb-20 overflow-x-auto pb-4 no-scrollbar">
+                    <div className="flex flex-nowrap bg-white/5 border border-white/10 p-1 rounded-2xl flex-shrink-0">
                         {CATEGORIES.map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeCategory === cat ? 'bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/20' : 'text-white/40 hover:text-white'}`}
+                                className={`px-4 md:px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap min-h-[44px] ${activeCategory === cat ? 'bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/20' : 'text-white/40 hover:text-white'}`}
                             >
                                 {cat}
                             </button>
@@ -121,7 +121,7 @@ function StudioPageContent() {
                 ) : (
                     <motion.div
                         layout
-                        className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10" : "flex flex-col gap-6"}
+                        className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10" : "flex flex-col gap-6"}
                     >
                         <AnimatePresence mode="popLayout">
                             {filteredWorkouts.slice(0, 24).map((workout) => (
