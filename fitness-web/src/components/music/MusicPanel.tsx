@@ -20,8 +20,10 @@ export default function MusicPanel() {
     const [isPremium, setIsPremium] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+    // `queue` is the master list of loaded tracks (Jamendo or Spotify)
     const [queue, setQueue] = useState<Track[]>([]);
-    const [playlists, setPlaylists] = useState<any[]>([]);
+    // `playlists` mirrors queue so ExpandedPlayer can render it; for Spotify it holds playlist metadata
+    const [playlists, setPlaylists] = useState<Track[]>([]);
     const [searchResults, setSearchResults] = useState<Track[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [deviceId, setDeviceId] = useState<string | null>(null);
@@ -53,12 +55,14 @@ export default function MusicPanel() {
     // ── Init ──────────────────────────────────────────────────────────────────
     useEffect(() => {
         const init = async () => {
-            // Always load Jamendo tracks immediately as the reliable default
             try {
                 const data = await SpotifyService.getPlaylists();
                 if (data.source === 'spotify') {
-                    setPlaylists(data.items as any[]);
+                    const tracks = data.items as Track[];
+                    setQueue(tracks);
+                    setPlaylists(tracks);   // mirror so ExpandedPlayer can render
                     setIsConnected(true);
+                    if (tracks.length > 0) setCurrentTrack(tracks[0]);
                     try {
                         const profile = await SpotifyService.getUserProfile();
                         setIsPremium(profile.product === 'premium');
@@ -67,15 +71,15 @@ export default function MusicPanel() {
                         // Profile fetch failed — non-premium flow
                     }
                 } else {
-                    // Jamendo fallback — set queue directly from items
+                    // Jamendo fallback
                     const tracks = data.items;
                     setQueue(tracks);
+                    setPlaylists(tracks);   // show in ExpandedPlayer track list
                     if (tracks.length > 0) setCurrentTrack(tracks[0]);
                     setIsConnected(true);
                     setError(null);
                 }
             } catch {
-                // Last resort: show a non-blocking message, don't crash
                 setError('Music service unavailable. Try again later.');
                 setIsConnected(false);
             }
@@ -207,14 +211,22 @@ export default function MusicPanel() {
             }
         }
 
-        // Preview / Jamendo playback
+        // Preview / Jamendo playback — auto-skip if no preview URL
         if (track.previewUrl) {
             playAudio(track.previewUrl);
         } else {
-            setError('No preview available for this track');
-            setIsPlaying(false);
+            // Skip to next track silently instead of showing an error
+            const trackList = searchResults.length > 0 ? searchResults : queue;
+            const idx = trackList.findIndex(t => t.id === track.id);
+            const next = trackList[(idx + 1) % trackList.length];
+            if (next && next.id !== track.id) {
+                // use a timeout to avoid infinite recursion if entire list has no preview
+                setTimeout(() => handleSelectTrack(next), 0);
+            } else {
+                setError('No playable tracks found');
+            }
         }
-    }, [currentTrack, isPlaying, isPremium, deviceId, playAudio, pauseAudio, startProgressTracking]);
+    }, [currentTrack, isPlaying, isPremium, deviceId, playAudio, pauseAudio, startProgressTracking, searchResults, queue]);
 
     // ── Toggle play/pause ─────────────────────────────────────────────────────
     const handleTogglePlay = useCallback(() => {
@@ -306,7 +318,12 @@ export default function MusicPanel() {
                     setIsPlaying(false);
                     stopProgressTracking();
                     setProgress(0);
-                    // Auto-play next
+                    handleNext(); // auto-play next track
+                }}
+                onError={() => {
+                    // Audio load failed — skip to next automatically
+                    stopProgressTracking();
+                    setIsPlaying(false);
                     handleNext();
                 }}
                 onTimeUpdate={() => {

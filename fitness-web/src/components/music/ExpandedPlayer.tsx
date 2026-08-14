@@ -20,7 +20,7 @@ interface ExpandedPlayerProps {
     onSeek: (ratio: number) => void;
     onVolumeChange: (vol: number) => void;
     searchResults: Track[];
-    playlists: any[];
+    playlists: Track[]; // unified track list (Jamendo or Spotify tracks)
     isConnected: boolean;
     onConnect: () => void;
     onSelectTrack: (track: Track) => void;
@@ -134,7 +134,7 @@ export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
                         <div className="flex-1 overflow-y-auto px-4 pb-3 space-y-1 min-h-0" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(204,255,0,0.15) transparent' }}>
                             {searchResults.length > 0 ? (
                                 <>
-                                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2 px-1">Search Results</p>
+                                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2 px-1">Search Results ({searchResults.length})</p>
                                     {searchResults.map((track) => (
                                         <TrackRow
                                             key={track.id}
@@ -145,44 +145,25 @@ export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
                                         />
                                     ))}
                                 </>
-                            ) : (
+                            ) : playlists.length > 0 ? (
                                 <>
                                     <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2 px-1">
-                                        {isConnected ? 'Featured Playlists' : 'Workout Tracks'}
+                                        Workout Tracks ({playlists.length})
                                     </p>
-                                    {playlists.map((item) => {
-                                        const track = item._track as Track | undefined;
-                                        if (track) {
-                                            // Jamendo track shape
-                                            return (
-                                                <TrackRow
-                                                    key={item.id}
-                                                    track={track}
-                                                    isActive={currentTrack?.id === track.id}
-                                                    isPlaying={isPlaying && currentTrack?.id === track.id}
-                                                    onClick={() => onSelectTrack(track)}
-                                                />
-                                            );
-                                        }
-                                        // Spotify playlist shape — display only
-                                        return (
-                                            <div
-                                                key={item.id}
-                                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-default"
-                                            >
-                                                <img
-                                                    src={item.images?.[0]?.url}
-                                                    alt={item.name}
-                                                    className="w-9 h-9 rounded-lg object-cover"
-                                                />
-                                                <div className="min-w-0">
-                                                    <p className="text-[11px] font-bold text-white truncate uppercase">{item.name}</p>
-                                                    <p className="text-[9px] text-white/30 uppercase font-black">{item.tracks?.total} tracks</p>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                                    {playlists.map((track) => (
+                                        <TrackRow
+                                            key={track.id}
+                                            track={track}
+                                            isActive={currentTrack?.id === track.id}
+                                            isPlaying={isPlaying && currentTrack?.id === track.id}
+                                            onClick={() => onSelectTrack(track)}
+                                        />
+                                    ))}
                                 </>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center py-10 text-center">
+                                    <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Loading tracks...</p>
+                                </div>
                             )}
                         </div>
                     </div>
