@@ -418,7 +418,10 @@
                     <div class="day-name">MON <span>03</span></div>
                     <div class="class-card hiit">
                         <span class="time">08:00 AM</span>
-                        <strong>Morning Grind</strong>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+                            <strong>Morning Grind</strong>
+                            <button onclick="launchYoutubeVideo('Morning Grind', this)" style="background: transparent; border: none; color: #ff0000; cursor: pointer; padding: 4px; font-size: 14px; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;" title="Watch tutorial on YouTube"><i class="fab fa-youtube"></i></button>
+                        </div>
                         <span class="trainer">Coach Sarah</span>
                         <button class="book-btn">BOOK</button>
                     </div>
@@ -436,7 +439,10 @@
                 <div class="rec-hero-content">
                     <h3>AI Guided Flexibility</h3>
                     <p>Designed to reduce inflammation and accelerate repair.</p>
-                    <button class="btn-wf-primary">BEGIN SESSION</button>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px;">
+                        <button class="btn-wf-primary" style="margin: 0;">BEGIN SESSION</button>
+                        <button class="btn-wf-primary" onclick="launchYoutubeVideo('AI Guided Flexibility', this)" style="margin: 0; background: #ff0000; border-color: #ff0000; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; min-width: 44px;"><i class="fab fa-youtube"></i> Watch Tutorial</button>
+                    </div>
                 </div>
             </div>
             <div class="recovery-options-grid">
@@ -444,11 +450,13 @@
                     <div class="rec-icon"><i class="fas fa-wind"></i></div>
                     <h3>Mindfulness</h3>
                     <p>10 Min meditation for focus.</p>
+                    <button class="btn-p-ghost" onclick="launchYoutubeVideo('Mindfulness meditation', this)" style="margin-top: 12px; width: 100%; border-radius: 8px; font-size: 10px; padding: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; font-weight: 800; cursor: pointer; text-transform: uppercase;"><i class="fab fa-youtube"></i> Watch Video</button>
                 </div>
                 <div class="rec-card">
                     <div class="rec-icon"><i class="fas fa-expand-alt"></i></div>
                     <h3>Lower Body Stretch</h3>
                     <p>Post-running mobility flow.</p>
+                    <button class="btn-p-ghost" onclick="launchYoutubeVideo('Lower Body Stretch mobility flow', this)" style="margin-top: 12px; width: 100%; border-radius: 8px; font-size: 10px; padding: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; font-weight: 800; cursor: pointer; text-transform: uppercase;"><i class="fab fa-youtube"></i> Watch Video</button>
                 </div>
             </div>
         </section>
@@ -741,6 +749,9 @@
                         • Drive knees outward tracking over toes.<br>
                         • Break parallel for full activation.
                     </div>
+                    <button class="btn-primary" onclick="launchYoutubeVideo(document.getElementById('focus-title').innerText, this)" style="margin-top: 12px; width: 100%; border-radius: 12px; font-size: 10px; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; cursor: pointer; min-height: 44px; text-transform: uppercase;">
+                        <i class="fab fa-youtube"></i> Watch Video Tutorial
+                    </button>
                 </div>
 
                 <div class="focus-safety-card">

@@ -791,4 +791,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (progress) progress.style.width = `${perc}%`;
     });
 
+    // 8. YOUTUBE VIDEO LAUNCHER (PROD-READY PORT)
+    window.launchYoutubeVideo = async (exerciseName, buttonEl) => {
+        let originalText = "";
+        if (buttonEl) {
+            originalText = buttonEl.innerHTML;
+            buttonEl.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading...`;
+            buttonEl.disabled = true;
+        }
+        try {
+            const res = await fetch(`http://localhost:3000/api/youtube/search?exerciseName=${encodeURIComponent(exerciseName)}`);
+            const data = await res.json();
+            if (data.videos && data.videos.length > 0) {
+                window.open(data.videos[0].youtubeUrl, '_blank');
+            } else {
+                window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(exerciseName + ' tutorial')}`, '_blank');
+            }
+        } catch (e) {
+            window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(exerciseName + ' tutorial')}`, '_blank');
+        } finally {
+            if (buttonEl) {
+                buttonEl.innerHTML = originalText;
+                buttonEl.disabled = false;
+            }
+        }
+    };
+
 });
+

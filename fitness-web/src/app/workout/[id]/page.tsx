@@ -19,6 +19,8 @@ import {
 import { Navbar } from '@/components/Navbar';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { exercises } from '@/data/exercises';
+import VideoLauncher from '@/components/VideoLauncher';
+
 
 export default function WorkoutDetailPage() {
     const params = useParams();
@@ -97,6 +99,7 @@ export default function WorkoutDetailPage() {
                             <button className="px-10 py-5 bg-white/5 border border-white/10 text-white font-black uppercase text-xs rounded-2xl flex items-center gap-3 hover:bg-white/10 transition-all">
                                 Add to Routine +
                             </button>
+                            <VideoLauncher exerciseName={exercise.title} variant="detail" label="Watch YouTube Tutorial" />
                         </div>
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Wind, Moon, Sun, Play, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import VideoLauncher from './VideoLauncher';
 
 export const YogaFlowCard = ({ flow }: { flow: any }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -51,6 +52,10 @@ export const YogaFlowCard = ({ flow }: { flow: any }) => {
                         >
                             Enter Zen <Play size={14} fill="black" />
                         </motion.button>
+                    </div>
+
+                    <div className="mt-4">
+                        <VideoLauncher exerciseName={flow.title} />
                     </div>
                 </div>
 

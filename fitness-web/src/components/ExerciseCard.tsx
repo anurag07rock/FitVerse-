@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Play, Flame, Timer, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import VideoLauncher from './VideoLauncher';
 
 interface ExerciseCardProps {
     exercise: {
@@ -105,6 +106,10 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise }) => {
                         <button className="text-white/40 hover:text-white transition-colors">
                             <Info size={18} />
                         </button>
+                    </div>
+
+                    <div className="mt-4">
+                        <VideoLauncher exerciseName={name || ''} />
                     </div>
                 </div>
 
