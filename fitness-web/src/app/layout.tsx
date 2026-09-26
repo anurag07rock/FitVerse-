@@ -35,6 +35,37 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="dark">
+            <head>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function() {
+                                function isExtensionError(msg, stack, filename) {
+                                    var str = (msg || '') + ' ' + (stack || '') + ' ' + (filename || '');
+                                    return str.indexOf('chrome-extension://') !== -1 ||
+                                           str.indexOf('chrome: call method') !== -1 ||
+                                           str.indexOf('Window message') !== -1;
+                                }
+                                window.addEventListener('error', function(e) {
+                                    if (isExtensionError(e.message, e.error && e.error.stack, e.filename)) {
+                                        e.stopImmediatePropagation();
+                                        e.preventDefault();
+                                    }
+                                }, true);
+                                window.addEventListener('unhandledrejection', function(e) {
+                                    var reason = e.reason;
+                                    var msg = (reason && reason.message) || String(reason || '');
+                                    var stack = (reason && reason.stack) || '';
+                                    if (isExtensionError(msg, stack)) {
+                                        e.stopImmediatePropagation();
+                                        e.preventDefault();
+                                    }
+                                }, true);
+                            })();
+                        `,
+                    }}
+                />
+            </head>
             <body className={`${inter.variable} ${oswald.variable} font-inter antialiased bg-background text-foreground selection:bg-brand selection:text-brand-bg`}>
                 <AuthProvider>
                     <ClientLayoutWrapper>

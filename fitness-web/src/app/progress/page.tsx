@@ -81,37 +81,84 @@ export default function ProgressPage() {
                 {/* Charts Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     {/* Calories Burned Chart */}
-                    <div className="bg-[#111] border border-white/5 rounded-[40px] p-10 flex flex-col">
-                        <div className="flex justify-between items-start mb-12">
+                    <div className="bg-[#111] border border-white/5 rounded-[40px] p-8 sm:p-10 flex flex-col justify-between">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h3 className="text-2xl font-black uppercase italic tracking-tighter mb-2">Weekly <span className="text-[#ccff00]">Energy Burn</span></h3>
-                                <p className="text-xs text-white/30 uppercase font-bold tracking-widest">Calorie tracking analytics</p>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
+                                    <h3 className="text-2xl font-black uppercase italic tracking-tighter">Weekly <span className="text-[#ccff00]">Energy Burn</span></h3>
+                                </div>
+                                <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Calorie tracking analytics</p>
                             </div>
                             <Calendar size={24} className="text-white/20" />
                         </div>
 
-                        <div className="flex-1 flex items-end justify-between gap-6 h-64">
-                            {weeklyData.map((d, i) => (
-                                <div key={i} className="flex-1 flex flex-col items-center gap-4 group cursor-pointer">
-                                    <div className="relative w-full flex-1 flex flex-col justify-end">
-                                        <motion.div
-                                            initial={{ height: 0 }}
-                                            animate={{ height: `${(d.kcal / maxKcal) * 100}%` }}
-                                            className="w-full bg-white/5 group-hover:bg-[#ccff00] rounded-2xl transition-all relative overflow-hidden"
-                                        >
-                                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent" />
-                                            {/* Glow effect on hover */}
-                                            <div className="absolute inset-0 bg-[#ccff00]/30 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </motion.div>
-                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-[#ccff00]">
-                                            {d.kcal}
-                                        </div>
-                                    </div>
-                                    <span className={`text-[10px] font-black uppercase tracking-widest ${d.day === 'Sat' ? 'text-[#ccff00]' : 'text-white/20'}`}>
-                                        {d.day}
+                        {/* Chart Container */}
+                        <div className="relative w-full h-72 flex flex-col justify-between pt-6 pb-2">
+                            {/* Reference Grid Lines */}
+                            <div className="absolute inset-x-0 top-6 bottom-12 flex flex-col justify-between pointer-events-none">
+                                <div className="border-b border-dashed border-white/10 flex justify-between items-center text-[9px] text-white/40 font-mono pb-1">
+                                    <span className="flex items-center gap-2">
+                                        <span>1000 kcal</span>
+                                        <span className="text-[#ccff00] uppercase font-bold text-[8px] tracking-wider px-2 py-0.5 rounded-full bg-[#ccff00]/15 border border-[#ccff00]/30 shadow-[0_0_10px_rgba(204,255,0,0.2)]">Target Goal</span>
                                     </span>
                                 </div>
-                            ))}
+                                <div className="border-b border-dashed border-white/5 flex justify-between items-center text-[9px] text-white/20 font-mono pb-1">
+                                    <span>500 kcal</span>
+                                </div>
+                                <div className="border-b border-white/10 flex justify-between items-center text-[9px] text-white/20 font-mono pb-1">
+                                    <span>0 kcal</span>
+                                </div>
+                            </div>
+
+                            {/* Bars Row */}
+                            <div className="relative z-10 w-full h-full flex items-end justify-between gap-2 sm:gap-4 px-2">
+                                {weeklyData.map((d, i) => {
+                                    const isPeak = d.day === 'Sat';
+                                    const heightPercent = Math.max(15, Math.round((d.kcal / 1000) * 100));
+
+                                    return (
+                                        <div key={i} className="flex-1 h-full flex flex-col items-center justify-end group cursor-pointer">
+                                            {/* Kcal Value */}
+                                            <div className="mb-2 text-center transition-all duration-200 group-hover:-translate-y-1">
+                                                <span className={`text-[11px] sm:text-xs font-black font-mono tracking-tight ${
+                                                    isPeak ? 'text-[#ccff00]' : 'text-white/60 group-hover:text-[#ccff00]'
+                                                }`}>
+                                                    {d.kcal}
+                                                </span>
+                                            </div>
+
+                                            {/* Bar Pillar */}
+                                            <div className="relative w-full max-w-[44px] h-48 bg-white/[0.04] border border-white/10 rounded-2xl p-1 flex flex-col justify-end group-hover:border-[#ccff00]/40 transition-all shadow-inner">
+                                                <motion.div
+                                                    initial={{ height: 0 }}
+                                                    animate={{ height: `${heightPercent}%` }}
+                                                    transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
+                                                    className={`w-full rounded-xl transition-all relative overflow-hidden ${
+                                                        isPeak
+                                                            ? 'bg-gradient-to-t from-[#ccff00] via-[#d4ff33] to-[#eeff99] shadow-[0_0_25px_rgba(204,255,0,0.5)]'
+                                                            : 'bg-gradient-to-t from-[#ccff00]/40 via-[#ccff00]/65 to-[#ccff00]/90 group-hover:from-[#ccff00] group-hover:to-[#eeff99]'
+                                                    }`}
+                                                >
+                                                    {/* Top cap highlight */}
+                                                    <div className="absolute top-0 inset-x-0 h-1 bg-white/70 rounded-full" />
+                                                    <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
+                                                </motion.div>
+                                            </div>
+
+                                            {/* Day Label */}
+                                            <div className="mt-3 flex flex-col items-center gap-1">
+                                                <span className={`text-[11px] font-black uppercase tracking-wider transition-colors ${
+                                                    isPeak ? 'text-[#ccff00]' : 'text-white/40 group-hover:text-white'
+                                                }`}>
+                                                    {d.day}
+                                                </span>
+                                                {isPeak && <span className="w-1.5 h-1.5 rounded-full bg-[#ccff00] shadow-[0_0_8px_#ccff00]" />}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
 
